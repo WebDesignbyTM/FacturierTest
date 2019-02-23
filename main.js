@@ -1,3 +1,8 @@
+const puppeteer=require('puppeteer');
+// const express=require('express');const app=express();app.use(express.static('/Users/cipri/Documents/logoFacturier'));app.listen(3000);
+const fs=require('file-system');
+const datetime = require('node-datetime');
+
 function Company(name, cif, regCom, adress, logo)
 {
 	this.name=name;
@@ -6,6 +11,7 @@ function Company(name, cif, regCom, adress, logo)
 	this.adress=adress;
 	this.logo=logo;
 }
+
 function Product(name, measureUnit, quantity, priceUnit, tvaCrt)
 {
 	this.name=name;
@@ -28,21 +34,16 @@ var cashier='Luminita Giurgiu';
 var p1=new Product('Paine', 'kg', 2, 2.4, 9);
 var p2=new Product('telefon', 'buc', 1, 10000000,19);
 var products=[p1,p2];
+var dt = datetime.create();
+var formattedDate = dt.format('d.m.Y');
 
 var total=0,totalBrut=0,totalTva=0;
 calcTotals();
 
 //auxiliare
 var resultHTML="";
-var d=new Date();
-var date=d.getDate()+'.'+(d.getMonth()+1)+'.'+d.getFullYear();
-
-const puppeteer=require('puppeteer');
-const express=require('express');const app=express();app.use(express.static('/Users/cipri/Documents/logoFacturier'));app.listen(3000);
-const fs=require('file-system');
 
 buildPage();
-
 
 function buildPage()
 {
@@ -80,7 +81,7 @@ function topBox()
 {
 	resultHTML+='<div width=\"100%\" height=\"200\">';
 	insertLogo(provider.logo, '30%',135);
-	resultHTML+='<div style=\"float:left;width:20%\"><h2>FACTURA</h2><h5>Data emiterii:'+date+'</h5></div>';
+	resultHTML+='<div style=\"float:left;width:20%\"><h2>FACTURA</h2><h5>Data emiterii:'+formattedDate+'</h5></div>';
 	resultHTML+='<div style=\"float:left;padding-top:5px;\"><h3>'+numberTicket+'</h3><h5>Cota T.V.A: '+tva+'%</h5></div>';
 
 	resultHTML+='</div>';
@@ -155,9 +156,15 @@ function createPdfFile()
 			await page.goto(`data:text/html,${resultHTML}`, { waitUntil: 'networkidle0' });
  			await page.pdf(
  			{	
- 				path: `doamneAjuta.pdf`,
+ 				path: `Factura.pdf`,
    			 	format: 'A4',
-   			 	printBackground: true 
+   			 	printBackground: true,
+   			 	margin: { 
+   			 		left: '10px', 
+   			 		top: '4px', 
+   			 		right: '10px', 
+   			 		bottom: '20px' 
+   			 	}
    			});
 			console.log('pdf facut');
 			await browser.close();
@@ -214,7 +221,6 @@ function buildTableContent()
 		resultHTML+='<tr>';
 		//nr crt
 		resultHTML+='<td>'+(i+1)+'</td>';
-		//console.log(products[i]);
 		for(var property1 in products[i])
 		{
 			if(property1=='tvaCrt'||property1=='netPrice')
@@ -236,10 +242,10 @@ function buildTableSemiTotal()
 	//cine o facut
 	resultHTML+='<td colspan=\"3\"style=\"text-align:left;border:none;\">Intocmit de:<br>'+cashier+'</td>';
 	//total
-	resultHTML+='<td colspan=\"2\"style=\"text-align:left;border:none;\">Total</td>';
+	resultHTML+='<td colspan=\"2\"style=\"text-align:left;border:none;background-color:lightgreen;\">Total</td>';
 	//punem preturile
-	resultHTML+='<td style=\"border:none;text-align:center;\">'+totalBrut.toFixed(2)+'</td>';
-	resultHTML+='<td style=\"border:none\">'+totalTva.toFixed(2)+'</td>';
+	resultHTML+='<td style=\"border:none;text-align:center;background-color:lightgreen;\">'+totalBrut.toFixed(2)+'</td>';
+	resultHTML+='<td style=\"border:none;background-color:lightgreen;\">'+totalTva.toFixed(2)+'</td>';
 
 	resultHTML+='</tr>';
 }
