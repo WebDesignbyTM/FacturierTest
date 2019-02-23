@@ -1,0 +1,27 @@
+table
+{
+	/*
+	border-top:2px solid green;
+	border-bottom:2px solid green;
+	*/
+	border-collapse:collapse;
+}
+th
+{
+	border-top:2px solid green;
+	border-bottom:2px solid green;
+}
+tr.HeadTable
+{
+	border-top: 2px solid red;
+}
+td
+{
+	border-bottom:1px solid gray;
+	text-align: center;
+}
+.rightSide
+{
+	width:40%;
+	float:right;
+}
